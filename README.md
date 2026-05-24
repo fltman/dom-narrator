@@ -19,7 +19,7 @@ LLMs are great at code but bad at pronouns. *"Move this button next to that thin
 1. Clone the repo: `git clone https://github.com/fltman/dom-narrator.git`
 2. Open Chrome → `chrome://extensions`
 3. Toggle **Developer mode** (top-right)
-4. Click **Load unpacked** → select the cloned folder
+4. Click **Load unpacked** → select the cloned **`dom-narrator/`** folder itself (the one containing `manifest.json` at its root — Chrome's "unpacked" just means raw extension files, not a subfolder named `unpacked/`).
 5. Pin the extension to the toolbar
 
 ---
