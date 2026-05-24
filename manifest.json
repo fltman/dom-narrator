@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "DOM Narrator",
+  "version": "0.2.0",
+  "description": "Pick elements, drag them, narrate what you want — exports a grounded transcript for LLM-driven UI edits. CC BY 4.0 — Anders Bjarby.",
+  "author": "Anders Bjarby",
+  "permissions": ["activeTab", "storage", "scripting"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Toggle DOM Narrator panel"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["pcm-worklet.js"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

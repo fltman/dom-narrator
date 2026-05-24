@@ -1,0 +1,345 @@
+/* All DOM Narrator UI is isolated under #dn-root to avoid colliding with page styles. */
+
+#dn-highlight {
+  position: fixed;
+  pointer-events: none;
+  z-index: 2147483646;
+  border: 2px solid #ff3b81;
+  background: rgba(255, 59, 129, 0.08);
+  border-radius: 2px;
+  transition: all 60ms linear;
+  display: none;
+  box-sizing: border-box;
+}
+
+#dn-highlight.active {
+  display: block;
+}
+
+#dn-highlight .dn-tag {
+  position: absolute;
+  top: -22px;
+  left: -2px;
+  background: #ff3b81;
+  color: white;
+  font: 600 11px/1 ui-monospace, Menlo, monospace;
+  padding: 4px 6px;
+  border-radius: 3px 3px 0 0;
+  white-space: nowrap;
+  max-width: 400px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Selected elements get a persistent outline only. No layout perturbation. */
+[data-dn-selected="true"] {
+  outline: 2px solid #4ade80 !important;
+  outline-offset: 2px !important;
+}
+
+[data-dn-dragging="true"] {
+  opacity: 0.85;
+}
+
+/* Overlay container holds all floating drag handles, kept in sync via rAF. */
+#dn-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 2147483645;
+}
+
+.dn-handle {
+  position: fixed;
+  background: #16a34a;
+  color: white;
+  font: 600 11px/1 ui-monospace, Menlo, monospace;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: grab;
+  pointer-events: auto;
+  user-select: none;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dn-handle:hover {
+  background: #15803d;
+}
+
+.dn-handle.dragging {
+  cursor: grabbing;
+  background: #dc2626;
+}
+
+.dn-handle .dn-grip {
+  font-size: 14px;
+  line-height: 0.7;
+  letter-spacing: -2px;
+}
+
+.dn-handle .dn-handle-close {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0 0 0 4px;
+  margin: 0;
+}
+
+.dn-handle .dn-handle-close:hover {
+  color: white;
+}
+
+/* Floating control panel */
+#dn-panel {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  width: 320px;
+  background: #0f172a;
+  color: #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  font: 13px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  z-index: 2147483647;
+  user-select: none;
+  display: none;
+}
+
+#dn-panel.open {
+  display: block;
+}
+
+#dn-panel .dn-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-bottom: 1px solid #1e293b;
+  cursor: move;
+}
+
+#dn-panel .dn-title {
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+#dn-panel .dn-close {
+  background: transparent;
+  color: #94a3b8;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  padding: 2px 6px;
+}
+
+#dn-panel .dn-body {
+  padding: 12px;
+  display: grid;
+  gap: 10px;
+}
+
+#dn-panel .dn-row {
+  display: flex;
+  gap: 6px;
+}
+
+#dn-panel button.dn-btn {
+  flex: 1;
+  background: #1e293b;
+  color: #e2e8f0;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  padding: 8px 10px;
+  cursor: pointer;
+  font: 600 12px/1 -apple-system, sans-serif;
+}
+
+#dn-panel button.dn-btn:hover {
+  background: #334155;
+}
+
+#dn-panel button.dn-btn.active {
+  background: #ff3b81;
+  border-color: #ff3b81;
+  color: white;
+}
+
+#dn-panel button.dn-btn.recording {
+  background: #dc2626;
+  border-color: #dc2626;
+  color: white;
+  animation: dn-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes dn-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.6); }
+  50% { box-shadow: 0 0 0 6px rgba(220, 38, 38, 0); }
+}
+
+#dn-panel .dn-status {
+  font-size: 11px;
+  color: #94a3b8;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+#dn-panel .dn-log {
+  max-height: 220px;
+  overflow: auto;
+  background: #020617;
+  border-radius: 6px;
+  padding: 8px;
+  font: 11px/1.5 ui-monospace, Menlo, monospace;
+}
+
+#dn-panel .dn-log-entry {
+  padding: 2px 0;
+  border-bottom: 1px solid #0f172a;
+  word-break: break-word;
+}
+
+#dn-panel .dn-log-entry .dn-t {
+  color: #64748b;
+  margin-right: 6px;
+}
+
+#dn-panel .dn-log-entry.dn-speech .dn-text {
+  color: #fde68a;
+}
+
+#dn-panel .dn-log-entry.dn-select .dn-text {
+  color: #86efac;
+}
+
+#dn-panel .dn-log-entry.dn-drag .dn-text {
+  color: #93c5fd;
+}
+
+#dn-panel .dn-log-entry.dn-info .dn-text {
+  color: #94a3b8;
+  font-style: italic;
+}
+
+#dn-panel select.dn-lang,
+#dn-panel select.dn-engine,
+#dn-panel input.dn-input {
+  background: #1e293b;
+  color: #e2e8f0;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+#dn-panel input.dn-input {
+  font-family: ui-monospace, Menlo, monospace;
+}
+
+#dn-panel button.dn-btn.dn-primary {
+  background: #4ade80;
+  border-color: #4ade80;
+  color: #052e16;
+}
+
+#dn-panel button.dn-btn.dn-primary:hover {
+  background: #22c55e;
+  border-color: #22c55e;
+}
+
+#dn-panel button.dn-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+#dn-panel .dn-credit {
+  text-align: center;
+  font-size: 10px;
+  color: #64748b;
+  padding: 4px 0 0;
+  letter-spacing: 0.04em;
+}
+
+#dn-panel .dn-credit a {
+  color: #94a3b8;
+  text-decoration: none;
+}
+
+#dn-panel .dn-credit a:hover {
+  color: #e2e8f0;
+  text-decoration: underline;
+}
+
+#dn-panel .dn-refined {
+  display: grid;
+  gap: 8px;
+  margin-top: 4px;
+  border-top: 1px solid #1e293b;
+  padding-top: 10px;
+}
+
+#dn-panel .dn-refined-loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px;
+  background: #020617;
+  border: 1px solid #1e293b;
+  border-radius: 6px;
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+#dn-panel .dn-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #334155;
+  border-top-color: #4ade80;
+  border-radius: 50%;
+  animation: dn-spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes dn-spin {
+  to { transform: rotate(360deg); }
+}
+
+#dn-panel .dn-refined-loading-text::after {
+  content: "";
+  display: inline-block;
+  width: 1em;
+  text-align: left;
+  animation: dn-dots 1.4s steps(4, end) infinite;
+}
+
+@keyframes dn-dots {
+  0%   { content: ""; }
+  25%  { content: "."; }
+  50%  { content: ".."; }
+  75%  { content: "..."; }
+}
+
+#dn-panel .dn-refined-text {
+  width: 100%;
+  min-height: 180px;
+  background: #020617;
+  color: #e2e8f0;
+  border: 1px solid #1e293b;
+  border-radius: 6px;
+  padding: 8px;
+  font: 12px/1.45 ui-monospace, Menlo, monospace;
+  resize: vertical;
+  box-sizing: border-box;
+}
