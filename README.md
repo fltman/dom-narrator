@@ -1,5 +1,7 @@
 # DOM Narrator
 
+[![Support me on Patreon](https://img.shields.io/badge/Patreon-Support%20my%20work-FF424D?style=flat&logo=patreon&logoColor=white)](https://www.patreon.com/AndersBjarby)
+
 A Chrome extension for **showing, not telling** an AI coding assistant what to change on a webpage.
 
 You click elements on the page, drag them with a handle, and narrate what you want — all in one flow. The extension builds a grounded, timestamped transcript that resolves "this", "that", and "here" against actual DOM selections. It then refines that messy session into a clean, copy-pastable prompt for Claude Code (or any AI coding assistant).
